@@ -701,6 +701,7 @@ MonoBehaviour:
   - {fileID: 8209054730677487543, guid: 248ead4a7e69c6a4a89074a5c88ed5d1, type: 3}
   - {fileID: 6600374365519883236, guid: 77db4e7d1b9539f45974f63bbeea1a17, type: 3}
   - {fileID: 9130163419247465262, guid: 7e239ae6a7c5e8748840f45a2aeb0b94, type: 3}
+  - {fileID: 0}
 --- !u!114 &330585551
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -796,7 +797,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 407221145}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 330585550}
+        m_TargetAssemblyTypeName: ShapePlacement, Assembly-CSharp
+        m_MethodName: SelectShape
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 4
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &407221145
 MonoBehaviour:
   m_ObjectHideFlags: 0

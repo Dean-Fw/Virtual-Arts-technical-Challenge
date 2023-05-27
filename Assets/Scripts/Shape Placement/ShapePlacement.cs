@@ -5,6 +5,7 @@ public class ShapePlacement : MonoBehaviour
 {
     public GameObject[] shapePrefabs; // Assign the shape prefabs in the Inspector
     private GameObject selectedShapePrefab;
+    private ShapeObject highlightedShape;
 
     private void Start()
     {
@@ -12,10 +13,11 @@ public class ShapePlacement : MonoBehaviour
         selectedShapePrefab = null;
     }
 
+
     public void SelectShape(int index)
     {
         // Ensure the index is within valid range
-        if (index >= 0 && index < shapePrefabs.Length)
+        if (index >= 0 && index < shapePrefabs.Length - 1)
         {
             selectedShapePrefab = shapePrefabs[index];
         }
@@ -50,6 +52,24 @@ public class ShapePlacement : MonoBehaviour
                     {
                         // Place the shape on the plane
                         PlaceShapeOnPlane(ray, hit.point);
+                    }
+                }
+            }
+            else
+            {
+                // Raycast to detect the click position in the scene
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit;
+
+                if (Physics.Raycast(ray, out hit))
+                {
+                    // Check if the hit object is a shape
+                    ShapeObject shapeObject = hit.collider.GetComponent<ShapeObject>();
+
+                    if (shapeObject != null)
+                    {
+                        // Highlight shape as selected
+                        HighlightShape(shapeObject);
                     }
                 }
             }
@@ -88,5 +108,22 @@ public class ShapePlacement : MonoBehaviour
         {
             shapeRigidbody.isKinematic = false; // Enable physics interactions
         }
+    }
+
+    private void HighlightShape(ShapeObject shapeObject)
+    {
+        if (shapeObject != highlightedShape)
+        {
+            Renderer shapeRenderer = shapeObject.GetComponent<Renderer>();
+            shapeRenderer.material.color = Color.blue;
+            highlightedShape = shapeObject;
+        }
+        else
+        {
+            Renderer shapeRenderer = shapeObject.GetComponent<Renderer>();
+            shapeRenderer.material.color = Color.red;
+            highlightedShape = null;
+        }
+            
     }
 }
