@@ -1,24 +1,15 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class ShapePlacement : MonoBehaviour
 {
     public GameObject[] shapePrefabs; // Assign the shape prefabs in the Inspector
     private GameObject selectedShapePrefab;
 
-    private Plane plane;
-
     private void Start()
     {
-        // Select the first shape as the default
-        SelectShape(0);
-
-        // Create a plane using the normal of the first shape prefab
-        if (shapePrefabs.Length > 0)
-        {
-            Vector3 normal = shapePrefabs[0].transform.up;
-            Vector3 point = shapePrefabs[0].transform.position;
-            plane = new Plane(normal, point);
-        }
+        // No shape is selected by default
+        selectedShapePrefab = null;
     }
 
     public void SelectShape(int index)
@@ -28,51 +19,74 @@ public class ShapePlacement : MonoBehaviour
         {
             selectedShapePrefab = shapePrefabs[index];
         }
+        else
+        {
+            selectedShapePrefab = null; // Invalid index, no shape selected
+        }
     }
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
         {
-            // Raycast to detect the click position in the scene
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit[] hits = Physics.RaycastAll(ray);
-
-            if (hits.Length > 0)
+            // Ensure a shape is selected
+            if (selectedShapePrefab != null)
             {
-                // Sort the raycast hits by distance in ascending order
-                System.Array.Sort(hits, (x, y) => x.distance.CompareTo(y.distance));
+                // Raycast to detect the click position in the scene
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit;
 
-                // Find the intersection point with the plane
-                float distance;
-                if (plane.Raycast(ray, out distance))
+                if (Physics.Raycast(ray, out hit))
                 {
-                    Vector3 intersectionPoint = ray.GetPoint(distance);
+                    // Check if the hit object is a shape
+                    ShapeObject shapeObject = hit.collider.GetComponent<ShapeObject>();
 
-                    // Check for valid placement by ignoring hits that are closer than the intersection point
-                    for (int i = 0; i < hits.Length; i++)
+                    if (shapeObject != null)
                     {
-                        if (hits[i].distance > distance)
-                        {
-                            // Calculate an offset based on the shape's size
-                            Vector3 shapeSize = selectedShapePrefab.transform.localScale;
-                            float yOffset = shapeSize.y * 0.5f;
-
-                            // Instantiate the selected shape at the intersection point with the offset
-                            Vector3 spawnPosition = intersectionPoint + Vector3.up * yOffset;
-                            GameObject newShape = Instantiate(selectedShapePrefab, spawnPosition, Quaternion.identity);
-                            Rigidbody shapeRigidbody = newShape.GetComponent<Rigidbody>();
-
-                            if (shapeRigidbody != null)
-                            {
-                                shapeRigidbody.isKinematic = false; // Enable physics interactions
-                            }
-
-                            break;
-                        }
+                        // Place the shape on top of the existing shape
+                        PlaceShapeOnTop(shapeObject);
+                    }
+                    else
+                    {
+                        // Place the shape on the plane
+                        PlaceShapeOnPlane(ray, hit.point);
                     }
                 }
             }
+        }
+    }
+
+    private void PlaceShapeOnTop(ShapeObject shapeObject)
+    {
+        // Calculate the offset based on the size of the shape prefab
+        Vector3 shapeSize = selectedShapePrefab.transform.localScale;
+        float yOffset = shapeSize.y;
+
+        // Instantiate the selected shape on top of the existing shape
+        Vector3 spawnPosition = shapeObject.transform.position + Vector3.up * yOffset;
+        GameObject newShape = Instantiate(selectedShapePrefab, spawnPosition, Quaternion.identity);
+        Rigidbody shapeRigidbody = newShape.GetComponent<Rigidbody>();
+
+        if (shapeRigidbody != null)
+        {
+            shapeRigidbody.isKinematic = false; // Enable physics interactions
+        }
+    }
+
+    private void PlaceShapeOnPlane(Ray ray, Vector3 intersectionPoint)
+    {
+        // Calculate the offset based on the size of the shape prefab
+        Vector3 shapeSize = selectedShapePrefab.transform.localScale;
+        float yOffset = shapeSize.y * 0.5f;
+
+        // Instantiate the selected shape on the plane
+        Vector3 spawnPosition = intersectionPoint + Vector3.up * yOffset;
+        GameObject newShape = Instantiate(selectedShapePrefab, spawnPosition, Quaternion.identity);
+        Rigidbody shapeRigidbody = newShape.GetComponent<Rigidbody>();
+
+        if (shapeRigidbody != null)
+        {
+            shapeRigidbody.isKinematic = false; // Enable physics interactions
         }
     }
 }

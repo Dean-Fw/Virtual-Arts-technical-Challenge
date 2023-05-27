@@ -128,3 +128,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6df47b56b7e3b548a43721ee57e0f5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shapePrefab: {fileID: 9130163419247465262}
