@@ -5,11 +5,14 @@ TagManager:
   serializedVersion: 2
   tags:
   - Plane
+  - Cube
+  - Cylinder
+  - Capsule
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Shape
   - Water
   - UI
   - 

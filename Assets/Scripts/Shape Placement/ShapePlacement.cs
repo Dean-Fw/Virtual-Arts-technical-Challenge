@@ -4,8 +4,11 @@ using UnityEngine.EventSystems;
 public class ShapePlacement : MonoBehaviour
 {
     public GameObject[] shapePrefabs; // Assign the shape prefabs in the Inspector
+    public float moveSpeed;
+
     private GameObject selectedShapePrefab;
-    private ShapeObject highlightedShape;
+    private ShapeObject heldShapeObject;
+
 
     private void Start()
     {
@@ -73,6 +76,48 @@ public class ShapePlacement : MonoBehaviour
                     }
                 }
             }
+
+            
+        }
+        // Check if a shape is currently held
+        if (heldShapeObject != null && Input.GetMouseButton(0))
+        {
+            // Create a layer mask that excludes the shape collider
+            LayerMask layerMask = ~LayerMask.GetMask("Shape");
+            // Raycast to detect the position in the scene
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerMask))
+            {
+                // Move the held shape to the new position
+                Vector3 shapeSize = heldShapeObject.transform.localScale;
+                float yOffset = 0f;
+                if (heldShapeObject.tag == "Cube")
+                {
+                    yOffset = shapeSize.y * 0.5f;
+                }
+                else if (heldShapeObject.tag == "Cylinder")
+                {
+                    yOffset = shapeSize.y * 1f;
+                }
+                else if (heldShapeObject.tag == "Capsule")
+                {
+                    yOffset = shapeSize.y * 1f;
+                }
+
+
+                heldShapeObject.transform.position = new Vector3(hit.point.x, yOffset, hit.point.z);
+            }
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            // Reset the held shape
+            if (heldShapeObject != null)
+            {
+                // De-highlight the shape
+                DehighlightShape(heldShapeObject);
+            }
         }
     }
 
@@ -112,18 +157,17 @@ public class ShapePlacement : MonoBehaviour
 
     private void HighlightShape(ShapeObject shapeObject)
     {
-        if (shapeObject != highlightedShape)
-        {
-            Renderer shapeRenderer = shapeObject.GetComponent<Renderer>();
-            shapeRenderer.material.color = Color.blue;
-            highlightedShape = shapeObject;
-        }
-        else
-        {
-            Renderer shapeRenderer = shapeObject.GetComponent<Renderer>();
-            shapeRenderer.material.color = Color.red;
-            highlightedShape = null;
-        }
-            
+        // set the color of the held shape to blue
+        Renderer shapeRenderer = shapeObject.GetComponent<Renderer>();
+        shapeRenderer.material.color = Color.blue;
+        heldShapeObject = shapeObject;
+    }
+
+    private void DehighlightShape(ShapeObject shapeObject)
+    {
+        // Reset the color of the shape back to red
+        Renderer shapeRenderer = shapeObject.GetComponent<Renderer>();
+        shapeRenderer.material.color = Color.red;
+        heldShapeObject = null;
     }
 }
