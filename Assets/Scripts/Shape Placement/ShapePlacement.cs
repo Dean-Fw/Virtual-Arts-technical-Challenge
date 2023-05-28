@@ -5,17 +5,17 @@ public class ShapePlacement : MonoBehaviour
 {
     public GameObject[] shapePrefabs; // Assign the shape prefabs in the Inspector
     public float moveSpeed;
+    public ShapeObject heldShapeObject;
+    public ShapeObject selectedShapeObject;
 
     private GameObject selectedShapePrefab;
-    private ShapeObject heldShapeObject;
-
+    
 
     private void Start()
     {
         // No shape is selected by default
         selectedShapePrefab = null;
     }
-
 
     public void SelectShape(int index)
     {
@@ -48,6 +48,7 @@ public class ShapePlacement : MonoBehaviour
 
                     if (shapeObject != null)
                     {
+                        Debug.Log("fired");
                         // Place the shape on top of the existing shape
                         PlaceShapeOnTop(shapeObject);
                     }
@@ -75,12 +76,10 @@ public class ShapePlacement : MonoBehaviour
                         HighlightShape(shapeObject);
                     }
                 }
-            }
-
-            
+            }          
         }
         // Check if a shape is currently held
-        if (heldShapeObject != null && Input.GetMouseButton(0))
+        if (heldShapeObject != null && Input.GetMouseButton(0) && heldShapeObject != selectedShapeObject)
         {
             // Create a layer mask that excludes the shape collider
             LayerMask layerMask = ~LayerMask.GetMask("Shape");
@@ -92,22 +91,19 @@ public class ShapePlacement : MonoBehaviour
             {
                 // Move the held shape to the new position
                 Vector3 shapeSize = heldShapeObject.transform.localScale;
-                float yOffset = 0f;
-                if (heldShapeObject.tag == "Cube")
+                float yOffset = shapeSize.y * 0.5f;
+                if (heldShapeObject.tag == "Cylinder" || heldShapeObject.tag == "Capsule")
                 {
-                    yOffset = shapeSize.y * 0.5f;
+                    yOffset = shapeSize.y;
+                    Debug.Log(shapeSize.y);
                 }
-                else if (heldShapeObject.tag == "Cylinder")
-                {
-                    yOffset = shapeSize.y * 1f;
-                }
-                else if (heldShapeObject.tag == "Capsule")
-                {
-                    yOffset = shapeSize.y * 1f;
-                }
-
-
                 heldShapeObject.transform.position = new Vector3(hit.point.x, yOffset, hit.point.z);
+            }
+
+            float scroll = Input.GetAxis("Mouse ScrollWheel");
+            if (scroll != 0f && heldShapeObject != null)
+            {
+                heldShapeObject.transform.Rotate(Vector3.up, scroll * 30f);
             }
         }
         else if (Input.GetMouseButtonUp(0))
@@ -117,6 +113,7 @@ public class ShapePlacement : MonoBehaviour
             {
                 // De-highlight the shape
                 DehighlightShape(heldShapeObject);
+                
             }
         }
     }
@@ -125,13 +122,12 @@ public class ShapePlacement : MonoBehaviour
     {
         // Calculate the offset based on the size of the shape prefab
         Vector3 shapeSize = selectedShapePrefab.transform.localScale;
-        float yOffset = shapeSize.y;
+        float yOffset = shapeSize.y * 1f; 
 
         // Instantiate the selected shape on top of the existing shape
         Vector3 spawnPosition = shapeObject.transform.position + Vector3.up * yOffset;
         GameObject newShape = Instantiate(selectedShapePrefab, spawnPosition, Quaternion.identity);
         Rigidbody shapeRigidbody = newShape.GetComponent<Rigidbody>();
-
         if (shapeRigidbody != null)
         {
             shapeRigidbody.isKinematic = false; // Enable physics interactions
@@ -143,7 +139,7 @@ public class ShapePlacement : MonoBehaviour
         // Calculate the offset based on the size of the shape prefab
         Vector3 shapeSize = selectedShapePrefab.transform.localScale;
         float yOffset = shapeSize.y * 0.5f;
-
+        
         // Instantiate the selected shape on the plane
         Vector3 spawnPosition = intersectionPoint + Vector3.up * yOffset;
         GameObject newShape = Instantiate(selectedShapePrefab, spawnPosition, Quaternion.identity);
@@ -170,4 +166,5 @@ public class ShapePlacement : MonoBehaviour
         shapeRenderer.material.color = Color.red;
         heldShapeObject = null;
     }
+
 }

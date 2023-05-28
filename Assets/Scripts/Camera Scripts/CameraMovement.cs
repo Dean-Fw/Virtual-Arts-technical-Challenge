@@ -9,6 +9,9 @@ public class CameraMovement : MonoBehaviour
     public float minDistance = 1f; // The minimum distance between camera and target
     public float maxDistance = 100f; // The maximum distance between camera and target
     public float zoomSpeed = 5f;
+    
+    [SerializeField]
+    private ShapePlacement shapePlacement;
 
     private float horizontalAngle = 0f;
     private float verticalAngle = 30f;
@@ -27,17 +30,24 @@ public class CameraMovement : MonoBehaviour
         // Calculate the vertical rotation angle
         float verticalRotation = verticalInput * verticalSpeed * Time.deltaTime;
         verticalAngle += verticalRotation;
-        verticalAngle = Mathf.Clamp(verticalAngle, 0f, 90f);
+        verticalAngle = Mathf.Clamp(verticalAngle, 5f, 90f);
 
         // Calculate the new camera position
         Vector3 newPosition = target.position + Quaternion.Euler(verticalAngle, horizontalAngle, 0f) * new Vector3(0f, 0f, -radius);
         transform.position = newPosition;
 
+        // Rotate the camera to look at the target point
+        transform.LookAt(target.position);
+
+        bool isShapeHeld = shapePlacement.heldShapeObject != null;     
+        
         // Camera zooming controls
         float scrollInput = Input.GetAxis("Mouse ScrollWheel");
-        distance -= scrollInput * zoomSpeed;
-        distance = Mathf.Clamp(distance, minDistance, maxDistance);
-
+        if (!isShapeHeld)
+        {
+            distance -= scrollInput * zoomSpeed;
+            distance = Mathf.Clamp(distance, minDistance, maxDistance);
+        }
         // Calculate the new camera position based on the zoom distance
         Vector3 zoomDirection = transform.position - target.position;
         zoomDirection.Normalize();
@@ -45,8 +55,7 @@ public class CameraMovement : MonoBehaviour
 
         // Update the camera position
         transform.position = newPosition;
-
-        // Rotate the camera to look at the target point
-        transform.LookAt(target.position);
+       
+            
     }
 }

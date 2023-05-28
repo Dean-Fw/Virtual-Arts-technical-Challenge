@@ -685,6 +685,7 @@ MonoBehaviour:
   minDistance: 1
   maxDistance: 10
   zoomSpeed: 5
+  shapePlacement: {fileID: 330585550}
 --- !u!114 &330585550
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -703,6 +704,8 @@ MonoBehaviour:
   - {fileID: 9130163419247465262, guid: 7e239ae6a7c5e8748840f45a2aeb0b94, type: 3}
   - {fileID: 0}
   moveSpeed: 0
+  heldShapeObject: {fileID: 0}
+  selectedShapeObject: {fileID: 0}
 --- !u!114 &330585551
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1118,10 +1121,10 @@ RectTransform:
   m_Father: {fileID: 1853280314}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -204.07602}
-  m_SizeDelta: {x: 0, y: -408.152}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 59.92398}
+  m_SizeDelta: {x: 1166, y: 119.84799}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &943452882
 MonoBehaviour:

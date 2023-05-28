@@ -8,6 +8,7 @@ TagManager:
   - Cube
   - Cylinder
   - Capsule
+  - DeathPlane
   layers:
   - Default
   - TransparentFX
